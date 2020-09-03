@@ -1,0 +1,15 @@
+# Dev Folders
+.vscode
+venv
+
+# Runtime Folders
+__pycache__
+
+# Config Files
+config.json
+
+# Intermediate Files
+user.json
+
+# Images Folders
+images
