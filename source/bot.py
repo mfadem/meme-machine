@@ -2,6 +2,8 @@
 import json
 import requests
 import urllib
+import random
+import os
 import tweepy
 from PIL import Image
 
@@ -9,6 +11,7 @@ class TwitterBot:
     def __init__(self, json_file):
         self.api_key = ''
         self.api_client = None
+        self.templates = []
 
         with open(json_file, 'r') as json_config:
             dict_config = json.load(json_config)
@@ -17,32 +20,23 @@ class TwitterBot:
             self.bearer_token = dict_config["bearer-token"]
             self.access_token = dict_config["access-token"]
             self.access_token_secret = dict_config["access-token-secret"]
-            self.imageflip_username = dict_config["imageflip-username"]
-            self.imageflip_password = dict_config["imageflip-password"]
-            self.templates = []
-            # print(self.api_key)
-            # print(self.api_secret_key)
-            # print(self.bearer_token)
-            # print(self.access_token)
-            # print(self.access_token_secret)
-            # print(self.imageflip_username)
-            # print(self.imageflip_password)
+            self.imgflip_username = dict_config["imgflip-username"]
+            self.imgflip_password = dict_config["imgflip-password"]
+            self.browser_user_agent = dict_config["browser-user-agent"]
 
         # Authenticate the api client
         auth = tweepy.OAuthHandler(self.api_key, self.api_secret_key)
         auth.set_access_token(self.access_token, self.access_token_secret)
         self.api_client = tweepy.API(auth, wait_on_rate_limit=True)
 
-    def updateBotStatus(self, status_text=""):
+    def updateBotStatus(self, status_text="", media_id=""):
         with open('user.json', 'r') as user_json:
             user_dict = json.load(user_json)
-        media_id = mediaUpload("images/hello_there.png")
-        self.api_client.update_status("@Science2048", media_ids=media_id)
+        self.api_client.update_status(status_text, media_ids=media_id)
 
     def slideIntoDM(self):
         with open('user.json', 'r') as user_json:
             user_dict = json.load(user_json)
-        media_id = mediaUpload("images/hello_there.png")
         self.api_client.send_direct_message(user_dict["id"], "", attachment_type="media", attachment_media_id=media_id)
 
     def getData(self, user=""):
@@ -54,7 +48,7 @@ class TwitterBot:
             json.dump(user._json, user_json, indent=4)
 
     def mediaUpload(self, filename):
-        media_upload = self.api_client.media_upload("images/hello_there.png")
+        media_upload = self.api_client.media_upload(filename)
         media_id = [media_upload.media_id_string]
         return media_id
 
@@ -63,25 +57,40 @@ class TwitterBot:
         image_name = jpg_file.split(".")
         image_name = image_name[0] + ".png"
         image.save(image_name)
+        os.remove(jpg_file)
+        return image_name
 
     def pullMemeTemplates(self):
         data = requests.get('https://api.imgflip.com/get_memes').json()['data']['memes']
-        self.templates = [{'name':image['name'],'url':image['url'],'id':image['id']} for image in data]
+        with open('memes.json', 'w') as memes_json:
+            json.dump(data, memes_json, indent=4)
+        self.templates = [{'name':image['name'],'url':image['url'],'id':image['id'],'box_count':image['box_count']} for image in data]
 
-        print('Here is the list of available memes : \n')
-        ctr = 1
-        for meme in self.templates:
-            print(ctr, meme['name'])
-            ctr = ctr+1
+    def createMeme(self, topText, bottomText, image=None):
+        random_meme_id = random.choice(self.templates)
+        url = 'https://api.imgflip.com/caption_image'
+        params = {
+        'username':self.imgflip_username,
+        'password':self.imgflip_password,
+        'template_id':random_meme_id['id'],
+        'text0':topText,
+        'text1':bottomText
+        }
+        response = requests.request('POST',url,params=params).json()
 
-    def createMeme(self, topText, bottomText, image=""):
-        return True
+        opener = urllib.request.URLopener()
+        opener.addheader('User-Agent', self.browser_user_agent)
+        filename, headers = opener.retrieve(response['data']['url'], 'images/' + random_meme_id['name'] + '.jpg')
+        return 'images/' + random_meme_id['name'] + '.jpg'
 
 
 def main():
     apiInstance = TwitterBot("source/config.json")
     apiInstance.pullMemeTemplates()
-    # apiInstance.getTwitter()
+    meme = apiInstance.createMeme("CS Post Bot 2048", "CS Post Bot 4096")
+    converted_meme = apiInstance.convertImagePng(meme)
+    media_id = apiInstance.mediaUpload(converted_meme)
+    apiInstance.updateBotStatus("Beep Boop", media_id)
 
 # Program Entry Point
 if __name__ == '__main__':

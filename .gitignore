@@ -10,6 +10,7 @@ config.json
 
 # Intermediate Files
 user.json
+memes.json
 
 # Images Folders
 images
