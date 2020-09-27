@@ -15,7 +15,6 @@ This Bot utilizes the following libraries:
 ## Config File
 Your `json/config.json` file should look like this:
 
-    ```json
     {
         "api-key": "Your Twitter Key Here!",
         "api-secret-key": "Your Twitter Key Here!",
@@ -26,7 +25,6 @@ Your `json/config.json` file should look like this:
         "imgflip-password": "Your Imgflip Password Here!",
         "browser-user-agent": "Your Browser User Agent Here!"
     }
-    ```
 
 ## Installation & Execution
 * Clone this repo
