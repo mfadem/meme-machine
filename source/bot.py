@@ -104,6 +104,8 @@ class TwitterBot:
 
         opener = urllib.request.URLopener()
         opener.addheader('User-Agent', self.browser_user_agent)
+        if not os.path.isdir("images"):
+            os.mkdir("images/")
         filename, headers = opener.retrieve(response['data']['url'], 'images/' + random_meme_id['name'] + '.jpg')
         return 'images/' + random_meme_id['name'] + '.jpg'
 
