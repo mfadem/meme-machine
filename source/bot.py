@@ -38,8 +38,6 @@ class TwitterBot:
         """
             Push a new status to Twitter with generated text/media
         """
-        with open('json/user.json', 'r') as user_json:
-            user_dict = json.load(user_json)
         self.api_client.update_status(status_text, media_ids=media_id)
 
     def slideIntoDM(self, user="", media_id=""):
