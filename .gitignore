@@ -5,12 +5,11 @@ venv
 # Runtime Folders
 __pycache__
 
-# Config Files
+# User/System JSON Files
+bot_status.json
 config.json
-
-# Intermediate Files
-user.json
 memes.json
+user.json
 
 # Images Folders
 images
