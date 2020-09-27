@@ -6,10 +6,7 @@ venv
 __pycache__
 
 # User/System JSON Files
-bot_status.json
-config.json
-memes.json
-user.json
+json
 
 # Images Folders
 images
