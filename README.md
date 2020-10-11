@@ -6,7 +6,7 @@ Competition to [CS Post Bot 2048](https://github.com/cgilbert250/CSPostBot2048)
 ## Installation & Execution
 * Clone this repo
 * Pip install the `requirements.txt` file: `pip3 install -r requirements.txt`
-    * I reccommend using a virtual environment to keep everything kosher on your system
+    * I recommend using a virtual environment to keep everything kosher on your system
 * Create a `config.json` file in the `json` directory following the directions below
 * Run the code from the root of the project with `python3 source/bot.py`
 
