@@ -20,7 +20,7 @@ This Bot utilizes the following libraries:
 * Requests: Send http/https requests to Imgflip API
 
 ## Config File
-Your `json/config.json` file should look like this:
+Your `json/config.json` file should look like this, a template config file is provided:
 
     {
         "api-key": "Your Twitter Key Here!",
