@@ -44,12 +44,12 @@ class TwitterBot:
         """
             Send a DM to a specified user along with media
         """
-        self.getData(user)
+        self.getUserData(user)
         with open('json/user.json', 'r') as user_json:
             user_dict = json.load(user_json)
         self.api_client.send_direct_message(user_dict["id"], "", attachment_type="media", attachment_media_id=media_id)
 
-    def getData(self, user=""):
+    def getUserData(self, user=""):
         """
             Get the data for a specified user (i.e. user ID, name, tweets, pfp, etc.)
         """
@@ -85,10 +85,18 @@ class TwitterBot:
             json.dump(data, memes_json, indent=4)
         self.templates = [{'name':image['name'],'url':image['url'],'id':image['id'],'box_count':image['box_count']} for image in data]
 
+    def grabMemeText(self):
+        """
+            Grab a random line from the input text file
+        """
+        with open("input/input.txt", "r") as input_file:
+            return random.choice(input_file.read().splitlines()) # Eh, this'll work
+
     def createMeme(self, topText, bottomText):
         """
             Slap some text on a image and you get a meme. That's how it works, right?
         """
+        # TODO: Convert `text0` and `text1` to boxes array for correct number of text lines in meme
         random_meme_id = random.choice(self.templates)
         url = 'https://api.imgflip.com/caption_image'
         params = {
@@ -112,10 +120,12 @@ def main():
     try:
         apiInstance = TwitterBot("json/config.json")
         apiInstance.pullMemeTemplates()
-        meme = apiInstance.createMeme("CS Post Bot 2048", "CS Post Bot 4096")
+        top_text = apiInstance.grabMemeText()
+        bottom_text = apiInstance.grabMemeText()
+        meme = apiInstance.createMeme(top_text, bottom_text)
         converted_meme = apiInstance.convertImagePng(meme)
         media_id = apiInstance.mediaUpload(converted_meme)
-        apiInstance.updateBotStatus("Beep Boop, my creator hasn't created any meme text yet ¯\_(ツ)_/¯", media_id)
+        apiInstance.updateBotStatus("Beep Boop, New Post Alert! \n @Science2048 Can you top this masterpiece?", media_id)
         os.remove(converted_meme)
     except Exception as err:
         print("Hey, I was lazy creating this thing and didn't add any error handling. ¯\_(ツ)_/¯ \n {0}\n\t{1}".format(err.with_traceback, err))
