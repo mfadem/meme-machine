@@ -92,22 +92,36 @@ class TwitterBot:
         with open("input/input.txt", "r") as input_file:
             return random.choice(input_file.read().splitlines()) # Eh, this'll work
 
-    def createMeme(self, topText, bottomText):
+    def createMeme(self):
         """
-            Slap some text on a image and you get a meme. That's how it works, right?
+            Slap some text on a image and you get a spicy meme. That's how it works, right?
         """
-        # TODO: Convert `text0` and `text1` to boxes array for correct number of text lines in meme
         random_meme_id = random.choice(self.templates)
+
+        # The imgflip api is kinda broken when using the boxes param, you can't pass an entire
+        # list to it, you need to specify the specific box and it's specific text, I think this logic
+        # would also hold for the other params of the boxes (i.e. x, y, color etc.).
+        param_boxes_dict = {}
+        for count in range(0, random_meme_id['box_count']):
+            param_boxes_dict['boxes[{}][text]'.format(count)] = self.grabMemeText()
+
         url = 'https://api.imgflip.com/caption_image'
         params = {
+        'template_id':random_meme_id['id'],
         'username':self.imgflip_username,
         'password':self.imgflip_password,
-        'template_id':random_meme_id['id'],
-        'text0':topText,
-        'text1':bottomText
+        'text0':self.grabMemeText(),
+        'text1':self.grabMemeText(),
+        'font':"arial", # impact/arial
+        'max_font_size':50,
         }
-        response = requests.request('POST',url,params=params).json()
 
+        # Merge the param dicts for the API boxes params
+        params = {**params, **param_boxes_dict}
+
+        response = requests.request('POST', url, params=params).json()
+
+        # TODO: DeprecationWarning: URLopener style of invoking requests is deprecated. Use newer urlopen functions/methods
         opener = urllib.request.URLopener()
         opener.addheader('User-Agent', self.browser_user_agent)
         if not os.path.isdir("images"):
@@ -120,12 +134,10 @@ def main():
     try:
         apiInstance = TwitterBot("json/config.json")
         apiInstance.pullMemeTemplates()
-        top_text = apiInstance.grabMemeText()
-        bottom_text = apiInstance.grabMemeText()
-        meme = apiInstance.createMeme(top_text, bottom_text)
+        meme = apiInstance.createMeme()
         converted_meme = apiInstance.convertImagePng(meme)
         media_id = apiInstance.mediaUpload(converted_meme)
-        apiInstance.updateBotStatus("Beep Boop, New Post Alert! \n @Science2048 Can you top this masterpiece?", media_id)
+        apiInstance.updateBotStatus("Beep Boop, New Post Alert! \n @Science2048 Can you top this masterpiece?\n #coding #programming #humor", media_id)
         os.remove(converted_meme)
     except Exception as err:
         print("Hey, I was lazy creating this thing and didn't add any error handling. ¯\_(ツ)_/¯ \n {0}\n\t{1}".format(err.with_traceback, err))

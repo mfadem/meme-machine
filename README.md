@@ -11,7 +11,7 @@ Competition to [CS Post Bot 2048](https://github.com/cgilbert250/CSPostBot2048)
 * Run the code from the root of the project with `python3 source/bot.py`
 
 ## Development
-* This bot was developed on WSL Ubuntu `18.04` utilizing Python `3.6.9`
+* This bot was developed on WSL Ubuntu `20.04` utilizing Python `3.8.5`
 
 ## Libraries
 This Bot utilizes the following libraries:
