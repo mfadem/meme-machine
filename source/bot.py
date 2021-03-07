@@ -137,7 +137,7 @@ def main():
         meme = apiInstance.createMeme()
         converted_meme = apiInstance.convertImagePng(meme)
         media_id = apiInstance.mediaUpload(converted_meme)
-        apiInstance.updateBotStatus("Beep Boop, New Post Alert! \n @Science2048 Can you top this masterpiece?\n #coding #programming #humor", media_id)
+        apiInstance.updateBotStatus("Beep Boop, New Post Alert! \n @Science2048 Can you top this masterpiece?\n #coding #programming #humor #meme", media_id)
         os.remove(converted_meme)
     except Exception as err:
         print("Hey, I was lazy creating this thing and didn't add any error handling. ¯\_(ツ)_/¯ \n {0}\n\t{1}".format(err.with_traceback, err))
